@@ -17,10 +17,10 @@ def build_model(config, opt_config):
     #    return EnsembleModel(config, opt_config)
     #else:
     if config.name == "nmn":
-        from nmn import NmnModel
+        from .nmn import NmnModel
         return NmnModel(config, opt_config)
     if config.name == "att":
-        from att import AttModel
+        from .att import AttModel
         return AttModel(config, opt_config)
     if config.name == "sp":
         from sp import StoredProgramModel

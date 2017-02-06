@@ -44,7 +44,7 @@ def parse_to_layout_helper(parse, world, config, modules):
             return modules["find"], MODULE_INDEX.index(parse)
     head = parse[0]
     below = [parse_to_layout_helper(c, world, config, modules) for c in parse[1:]]
-    modules_below, labels_below = zip(*below)
+    modules_below, labels_below = list(zip(*below))
     modules_below = tuple(modules_below)
     labels_below = tuple(labels_below)
     if head == "and":
@@ -65,7 +65,7 @@ def parse_to_layout(parse, world, config, modules):
     if not isinstance(head, ExistsModule):
         # wrap in translation module
         # TODO bad naming
-        mapping = {i: ANSWER_INDEX[ent] for ent, i in world.entities.items()}
+        mapping = {i: ANSWER_INDEX[ent] for ent, i in list(world.entities.items())}
         index = modules["answer_adaptor"].register(world.name, mapping)
         mods = (modules["answer_adaptor"], mods)
         indices = (index, indices)
@@ -156,9 +156,9 @@ class GeoTaskSet:
             cat_features = np.zeros((len(CATS), DATABASE_SIZE, 1))
             rel_features = np.zeros((len(RELS), DATABASE_SIZE, DATABASE_SIZE))
 
-            for p1, i_p1 in place_index.items():
+            for p1, i_p1 in list(place_index.items()):
                 cat_features[:, i_p1, 0] = cats[p1]
-                for p2, i_p2 in place_index.items():
+                for p2, i_p2 in list(place_index.items()):
                     rel_features[:, i_p1, i_p2] = rels[p1, p2]
 
             world = World(environment, clean_place_index, cat_features, rel_features)

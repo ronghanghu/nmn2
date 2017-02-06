@@ -29,17 +29,17 @@ class Visualizer:
 
         with open(os.path.join(self.dest_dir, "index.html"), "w") as vis_file:
             #print >>vis_file, "<html><head><link rel='stylesheet' href='style.css'></head><body><table>"
-            print >>vis_file, "<html><head>"
-            print >>vis_file, "<link rel='stylesheet' href='../style.css' />"
-            print >>vis_file, "</head><body><table>"
+            print("<html><head>", file=vis_file)
+            print("<link rel='stylesheet' href='../style.css' />", file=vis_file)
+            print("</head><body><table>", file=vis_file)
             for line in self.lines:
-                print >>vis_file, "  <tr>"
+                print("  <tr>", file=vis_file)
                 for field in line:
-                    print >>vis_file, "    <td>",
-                    print >>vis_file, field,
-                    print >>vis_file, "</td>"
-                print >>vis_file, "  </tr>"
-            print >>vis_file, "</table></body></html>"
+                    print("    <td>", end=' ', file=vis_file)
+                    print(field, end=' ', file=vis_file)
+                    print("</td>", file=vis_file)
+                print("  </tr>", file=vis_file)
+            print("</table></body></html>", file=vis_file)
 
     def show(self, data):
         if not self.active:

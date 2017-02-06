@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-from util import Index
+from .util import Index
 
 UNK = "*unknown*"
 NULL = "*null*"

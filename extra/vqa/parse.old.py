@@ -111,7 +111,7 @@ if __name__ == "__main__":
         else:
           target = content[0].group(1).lower()
 
-        print "(%s %s)" % (wh, target)
+        print("(%s %s)" % (wh, target))
         query_lines = []
         continue
 
@@ -127,7 +127,7 @@ if __name__ == "__main__":
         else:
           target = content[0].group(1).lower()
 
-        print "(%s %s)" % (wh, target)
+        print("(%s %s)" % (wh, target))
         query_lines = []
         continue
 
@@ -143,7 +143,7 @@ if __name__ == "__main__":
         else:
           target = content[0].group(1).lower()
 
-        print "(%s %s)" % (wh, target)
+        print("(%s %s)" % (wh, target))
         query_lines = []
         continue
 
@@ -159,7 +159,7 @@ if __name__ == "__main__":
         else:
           target = content[0].group(1).lower()
 
-        print "(what %s)" % target
+        print("(what %s)" % target)
         query_lines = []
         continue
 
@@ -171,11 +171,11 @@ if __name__ == "__main__":
         content = [re.match(CONTENT_RE, w) for w in content]
         content = [m for m in content if m]
         if len(content) == 0:
-          print "none"
+          print("none")
         elif len(content) == 1:
-          print "(is1 %s)" % content[0].group(1).lower()
+          print("(is1 %s)" % content[0].group(1).lower())
         else:
-          print "(is2 %s %s)" % (content[0].group(1).lower(), content[1].group(1).lower())
+          print("(is2 %s %s)" % (content[0].group(1).lower(), content[1].group(1).lower()))
 
         query_lines = []
         continue
@@ -191,7 +191,7 @@ if __name__ == "__main__":
         else:
           target = content[0].group(1).lower()
 
-        print "(how_many %s)" % target
+        print("(how_many %s)" % target)
         query_lines = []
         continue
 
@@ -206,7 +206,7 @@ if __name__ == "__main__":
         else:
           target = content[0].group(1).lower()
 
-        print "(where %s)" % target
+        print("(where %s)" % target)
         query_lines = []
         continue
 
@@ -218,16 +218,16 @@ if __name__ == "__main__":
         content = [re.match(CONTENT_RE, w) for w in content]
         content = [m for m in content if m]
         if len(content) == 0:
-          print "(what object)"
+          print("(what object)")
         elif len(content) == 1:
-          print "(can1 %s)" % content[0].group(1).lower()
+          print("(can1 %s)" % content[0].group(1).lower())
         else:
-          print "(can2 %s %s)" % (content[0].group(1).lower(), content[1].group(1).lower())
+          print("(can2 %s %s)" % (content[0].group(1).lower(), content[1].group(1).lower()))
 
         query_lines = []
         continue
 
-      print "(what object)"
+      print("(what object)")
       query_lines = []
       continue
 
@@ -244,7 +244,7 @@ if __name__ == "__main__":
           mtch = re.search(r", (.*)/", query_lines[2])
         assert mtch is not None
         obj = mtch.group(1)
-        print "(count %s)" % obj
+        print("(count %s)" % obj)
 
       elif "where" in question:
         mtch = None
@@ -258,7 +258,7 @@ if __name__ == "__main__":
           obj = mtch.group(1)
         else:
           obj = "object"
-        print "(where %s)" % obj
+        print("(where %s)" % obj)
 
       else:
         query = make_what_query(query_lines)
@@ -266,7 +266,7 @@ if __name__ == "__main__":
           #print "\n".join(query_lines)
           #print "warning: null query"
           query = "(_what _thing)"
-        print query
+        print(query)
 
       #query = convert_to_query(query_lines)
       #queries.append(query)

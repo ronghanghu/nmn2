@@ -41,7 +41,7 @@ def main():
                 train_acc, val_acc, test_acc)
 
         with open("logs/val_predictions_%d.json" % i_epoch, "w") as pred_f:
-            print >>pred_f, json.dumps(val_predictions)
+            print(json.dumps(val_predictions), file=pred_f)
 
         #with open("logs/test_predictions_%d.json" % i_epoch, "w") as pred_f:
         #    print >>pred_f, json.dumps(test_predictions)

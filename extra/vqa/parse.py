@@ -56,7 +56,7 @@ class LfParser(object):
         return nodes
 
     def annotate_paths(self, nodes):
-        for i, node in nodes.items():
+        for i, node in list(nodes.items()):
             path = node.path
             at = node
             hit = {i}
@@ -148,4 +148,4 @@ if __name__ == "__main__":
     #parser = LfParser(use_relations=True, max_conjuncts=2, max_leaves=None)
     parser = LfParser(use_relations=False, max_conjuncts=2, max_leaves=2)
     for parses in parser.parse_all(sys.stdin):
-        print ";".join(parses)
+        print(";".join(parses))

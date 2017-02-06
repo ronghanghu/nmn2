@@ -80,9 +80,9 @@ class AnswerAdaptor(Module):
         net.blobs[reduce].reshape((batch_size, n_outputs))
 
         if not self.loaded_weights:
-            for key, mapping in self.mappings.items():
+            for key, mapping in list(self.mappings.items()):
                 index = self.indices[key]
-                for inp, out in mapping.items():
+                for inp, out in list(mapping.items()):
                     net.params[weight_param].data[0, index, 0, inp * n_outputs + out] = 1
             self.loaded_weights = True
 
@@ -387,7 +387,7 @@ class Nmn:
             counter[0] += 1
             return r
         numbered = util.tree_map(number, modules)
-        assert util.flatten(numbered) == range(len(util.flatten(numbered)))
+        assert util.flatten(numbered) == list(range(len(util.flatten(numbered))))
 
         def children(tree):
             if not isinstance(tree, tuple):
@@ -404,7 +404,7 @@ class Nmn:
         flat_data = [util.flatten(d) for d in label_data]
         flat_data = np.asarray(flat_data)
         outputs = [None for i in range(len(self.modules))]
-        for i in reversed(range(len(self.modules))):
+        for i in reversed(list(range(len(self.modules)))):
             bottoms = [outputs[j] for j in self.children[i]]
             assert None not in bottoms
             mod_index = self.index * 100 + i

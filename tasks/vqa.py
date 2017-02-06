@@ -39,7 +39,7 @@ def prepare_indices(config):
             words = proc_question(question["question"])
             for word in words:
                 word_counts[word] += 1
-    for word, count in word_counts.items():
+    for word, count in list(word_counts.items()):
         if count >= MIN_COUNT:
             QUESTION_INDEX.index(word)
 
@@ -49,7 +49,7 @@ def prepare_indices(config):
             parts = line.strip().replace("(", "").replace(")", "").replace(";", " ").split()
             for part in parts:
                 pred_counts[part] += 1
-    for pred, count in pred_counts.items():
+    for pred, count in list(pred_counts.items()):
         if count >= 10 * MIN_COUNT:
             MODULE_INDEX.index(pred)
 
@@ -65,7 +65,7 @@ def prepare_indices(config):
                     continue
                 answer_counts[word] += 1
 
-    keep_answers = reversed(sorted([(c, a) for a, c in answer_counts.items()]))
+    keep_answers = reversed(sorted([(c, a) for a, c in list(answer_counts.items())]))
     keep_answers = list(keep_answers)[:config.answers]
     for count, answer in keep_answers:
         ANSWER_INDEX.index(answer)
@@ -81,8 +81,8 @@ def compute_normalizers(config):
             image_ids = image_ids[:config.debug]
         for image_id in image_ids:
             with np.load(IMAGE_FILE % ("train2014", "train2014", image_id)) as zdata:
-                assert len(zdata.keys()) == 1
-                image_data = zdata[zdata.keys()[0]]
+                assert len(list(zdata.keys())) == 1
+                image_data = zdata[list(zdata.keys())[0]]
                 sq_image_data = np.square(image_data)
                 mean += np.sum(image_data, axis=(1,2))
                 mmt2 += np.sum(sq_image_data, axis=(1,2))
@@ -99,7 +99,7 @@ def parse_to_layout_helper(parse, config, modules):
         return modules["find"], MODULE_INDEX[parse] or UNK_ID
     head = parse[0]
     below = [parse_to_layout_helper(c, config, modules) for c in parse[1:]]
-    modules_below, labels_below = zip(*below)
+    modules_below, labels_below = list(zip(*below))
     modules_below = tuple(modules_below)
     labels_below = tuple(labels_below)
     if head == "and":
@@ -139,8 +139,8 @@ class VqaDatum(Datum):
 
     def load_features(self):
         with np.load(self.input_path) as zdata:
-            assert len(zdata.keys()) == 1
-            image_data = zdata[zdata.keys()[0]]
+            assert len(list(zdata.keys())) == 1
+            image_data = zdata[list(zdata.keys())[0]]
         image_data -= self.mean
         image_data /= self.std
         channels, width, height = image_data.shape
@@ -180,12 +180,12 @@ class VqaTaskSet:
         for set_name in set_names:
             self.load_set(config, set_name, size, modules, mean, std)
 
-        for datum in self.by_id.values():
+        for datum in list(self.by_id.values()):
             self.by_layout_type[datum.layouts[0].modules].append(datum)
             datum.layout = datum.layouts[0]
 
-        self.layout_types = self.by_layout_type.keys()
-        self.data = self.by_id.values()
+        self.layout_types = list(self.by_layout_type.keys())
+        self.data = list(self.by_id.values())
 
         logging.info("%s:", ", ".join(set_names).upper())
         logging.info("%s items", len(self.by_id))
@@ -202,7 +202,7 @@ class VqaTaskSet:
             questions = json.load(question_f)["questions"]
             parse_groups = [l.strip() for l in parse_f]
             assert len(questions) == len(parse_groups)
-            pairs = zip(questions, parse_groups)
+            pairs = list(zip(questions, parse_groups))
             if size is not None:
                 pairs = pairs[:size]
             for question, parse_group in pairs:
@@ -233,7 +233,7 @@ class VqaTaskSet:
                     datum = VqaDatum(id, indexed_question, parses, layouts, image_set_name, image_id, [], mean, std)
                     self.by_id[id] = datum
                 except IOError as e:
-                    print e
+                    print(e)
                     pass
 
         if set_name not in ("test2015", "test-dev2015"):

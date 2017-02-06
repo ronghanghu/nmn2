@@ -8,13 +8,13 @@ class Index(PyLayer):
         data, indices = bottom
         index_data = indices.data.astype(int)
         top[0].reshape(indices.shape)
-        top[0].data[...] = data.data[range(indices.shape[0]), index_data]
+        top[0].data[...] = data.data[list(range(indices.shape[0])), index_data]
 
     def backward(self, top, bottom):
         data, indices = bottom
         index_data = indices.data.astype(int)
         data.diff[...] = 0
-        data.diff[range(indices.shape[0]), index_data] = top[0].diff
+        data.diff[list(range(indices.shape[0])), index_data] = top[0].diff
 
 class AsLoss(PyLayer):
     def __init__(self, name, **kwargs):
