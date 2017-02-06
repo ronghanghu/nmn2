@@ -31,15 +31,20 @@ def main():
                 do_iter(task.train, model, config, train=True)
         val_loss, val_acc, val_predictions = \
                 do_iter(task.val, model, config, vis=True)
-        test_loss, test_acc, test_predictions = \
-                do_iter(task.test, model, config)
+        # test_loss, test_acc, test_predictions = \
+        #         do_iter(task.test, model, config)
+
+        # logging.info(
+        #         "%5d  |  %8.3f  %8.3f  %8.3f  |  %8.3f  %8.3f  %8.3f",
+        #         i_epoch,
+        #         train_loss, val_loss, test_loss,
+        #         train_acc, val_acc, test_acc)
 
         logging.info(
-                "%5d  |  %8.3f  %8.3f  %8.3f  |  %8.3f  %8.3f  %8.3f",
+                "%5d  |  %8.3f  %8.3f |  %8.3f  %8.3f ",
                 i_epoch,
-                train_loss, val_loss, test_loss,
-                train_acc, val_acc, test_acc)
-
+                train_loss, val_loss,
+                train_acc, val_acc)
         with open("logs/val_predictions_%d.json" % i_epoch, "w") as pred_f:
             print(json.dumps(val_predictions), file=pred_f)
 
