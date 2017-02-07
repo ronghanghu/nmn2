@@ -88,7 +88,8 @@ def do_iter(task_set, model, config, train=False, vis=False):
     n_batches = 0
 
     # sort first to guarantee deterministic behavior with fixed seed
-    data = list(sorted(task_set.data))
+    # data = list(sorted(task_set.data))
+    data = task_set.data
     np.random.shuffle(data)
 
     if vis:

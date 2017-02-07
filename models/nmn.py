@@ -53,10 +53,10 @@ class AnswerAdaptor(Module):
         reduce_param_w = "AnswerAdaptor_reduce_param_w"
         reduce_param_b = "AnswerAdaptor_reduce_param_b"
 
-        batch_size = net.blobs[features].shape[0]
+        batch_size = net.blobs[features.encode()].shape[0]
         # TODO correct
         n_mappings = 10
-        n_inputs = net.blobs[features].shape[2]
+        n_inputs = net.blobs[features.encode()].shape[2]
         n_outputs = len(ANSWER_INDEX)
 
         net.f(NumpyData(data, label_data))
@@ -64,20 +64,20 @@ class AnswerAdaptor(Module):
             weights, n_inputs * n_outputs, n_mappings, bottoms=[data],
             param_names=[weight_param], weight_filler=Filler("constant", 0),
             param_lr_mults=[0]))
-        net.blobs[weights].reshape((batch_size, n_inputs, n_outputs))
+        net.blobs[weights.encode()].reshape((batch_size, n_inputs, n_outputs))
 
         net.f(Power(copy_input, bottoms=[input]))
-        net.blobs[copy_input].reshape((batch_size, n_inputs))
+        net.blobs[copy_input.encode()].reshape((batch_size, n_inputs))
         net.f(Scalar(scalar, 0, bottoms=[weights, copy_input]))
 
-        net.blobs[scalar].reshape((batch_size, n_inputs, n_outputs, 1))
+        net.blobs[scalar.encode()].reshape((batch_size, n_inputs, n_outputs, 1))
         net.f(Convolution(
             reduce, (1, 1), 1, bottoms=[scalar],
             param_names=[reduce_param_w, reduce_param_b],
             weight_filler=Filler("constant", 1),
             bias_filler=Filler("constant", 0),
             param_lr_mults=[0,0]))
-        net.blobs[reduce].reshape((batch_size, n_outputs))
+        net.blobs[reduce.encode()].reshape((batch_size, n_outputs))
 
         if not self.loaded_weights:
             for key, mapping in list(self.mappings.items()):
@@ -92,7 +92,7 @@ class LookupModule(Module):
     def forward(self, index, label_data, bottoms, features, rel_features, dropout, apollo_net):
         assert len(bottoms) == 0
         net = apollo_net
-        batch_size, channels, image_size, trailing = net.blobs[features].shape
+        batch_size, channels, image_size, trailing = net.blobs[features.encode()].shape
         assert trailing == 1
 
         assert self.config.att_normalization == "local"
@@ -113,7 +113,7 @@ class MLPFindModule(Module):
 
         net = apollo_net
 
-        batch_size, channels, image_size, trailing = net.blobs[image].shape
+        batch_size, channels, image_size, trailing = net.blobs[image.encode()].shape
         assert trailing == 1
 
         proj_image = "Find_%d_proj_image" % index
@@ -144,7 +144,7 @@ class MLPFindModule(Module):
         net.f(Wordvec(
                 label_vec, self.config.att_hidden, len(MODULE_INDEX),
                 bottoms=[label], param_names=[label_vec_param]))
-        net.blobs[label_vec].reshape((batch_size, self.config.att_hidden, 1, 1))
+        net.blobs[label_vec.encode()].reshape((batch_size, self.config.att_hidden, 1, 1))
         if dropout:
             net.f(Dropout(label_vec_dropout, 0.5, bottoms=[label_vec]))
             label_vec_final = label_vec_dropout
@@ -165,7 +165,7 @@ class MLPFindModule(Module):
             net.f(Softmax(softmax, bottoms=[mask]))
             prev = softmax
         net.f(Power(copy, bottoms=[prev]))
-        net.blobs[copy].reshape((batch_size, 1, image_size, 1))
+        net.blobs[copy.encode()].reshape((batch_size, 1, image_size, 1))
 
         return copy
 
@@ -175,7 +175,7 @@ class MultiplicativeFindModule(Module):
 
         net = apollo_net
 
-        batch_size, channels, image_size, trailing = net.blobs[features].shape
+        batch_size, channels, image_size, trailing = net.blobs[features.encode()].shape
         assert trailing == 1
 
         proj_image = "Find_%d_proj_image" % index
@@ -201,7 +201,7 @@ class MultiplicativeFindModule(Module):
         net.f(Wordvec(
                 label_vec, channels, len(MODULE_INDEX),
                 bottoms=[label], param_names=[label_vec_param]))
-        net.blobs[label_vec].reshape((batch_size, channels, 1, 1))
+        net.blobs[label_vec.encode()].reshape((batch_size, channels, 1, 1))
         if dropout:
             net.f(Dropout(label_vec_dropout, 0.5, bottoms=[label_vec]))
             label_vec_final = label_vec_dropout
@@ -226,7 +226,7 @@ class MultiplicativeFindModule(Module):
         # TODO still WTF
         net.f(Power(copy, bottoms=[prev]))
 
-        net.blobs[copy].reshape((batch_size, 1, image_size, 1))
+        net.blobs[copy.encode()].reshape((batch_size, 1, image_size, 1))
 
         return copy
 
@@ -234,7 +234,7 @@ class RelateModule(Module):
     def forward(self, index, label_data, bottoms, features, rel_features,
             dropout, apollo_net):
         net = apollo_net
-        batch_size, rel_channels, image_size, _ = net.blobs[rel_features].shape
+        batch_size, rel_channels, image_size, _ = net.blobs[rel_features.encode()].shape
         assert len(bottoms) == 1
         mask = bottoms[0]
 
@@ -257,7 +257,7 @@ class RelateModule(Module):
         reduce2_param_weight = "ReAttend_reduce2_param_weight"
         reduce2_param_bias = "ReAttend_reduce2_param_bias"
 
-        net.blobs[mask].reshape((batch_size, 1, 1, image_size))
+        net.blobs[mask.encode()].reshape((batch_size, 1, 1, image_size))
         net.f(Tile(
                 tile_mask_feats, axis=1, tiles=rel_channels, bottoms=[mask]))
         net.f(Tile(
@@ -276,7 +276,7 @@ class RelateModule(Module):
         net.f(Wordvec(
                 param, rel_channels, len(MODULE_INDEX), bottoms=[labels],
                 param_names=[wordvec_param]))
-        net.blobs[param].reshape((batch_size, rel_channels, 1, 1))
+        net.blobs[param.encode()].reshape((batch_size, rel_channels, 1, 1))
         net.f(Tile(tile_param, axis=2, tiles=image_size, bottoms=[param]))
         net.f(Eltwise(prod, "PROD", bottoms=[tile_param, reduce]))
 
@@ -302,7 +302,7 @@ class AndModule(Module):
     def forward(self, index, label_data, bottoms, features, rel_features, dropout, apollo_net):
         net = apollo_net
         assert len(bottoms) >= 2
-        assert all(net.blobs[l].shape[1] == 1 for l in bottoms)
+        assert all(net.blobs[l.encode()].shape[1] == 1 for l in bottoms)
 
         prod = "And_%d_prod" % index
 
@@ -318,7 +318,7 @@ class DescribeModule(Module):
 
         net = apollo_net
 
-        batch_size, channels, image_size, _ = net.blobs[features].shape
+        batch_size, channels, image_size, _ = net.blobs[features.encode()].shape
 
         tile_mask = "Describe_%d_tile_mask" % index
         weight = "Describe_%d_weight" % index
@@ -491,8 +491,8 @@ class NmnModel:
         chosen_hidden = self.forward_choice(module_layouts, layout_mask, nmn_hiddens)
         self.prediction = self.forward_pred(question_hidden, chosen_hidden)
 
-        batch_size = self.apollo_net.blobs[nmn_hiddens[0]].shape[0]
-        self.prediction_data = self.apollo_net.blobs[self.prediction].data
+        batch_size = self.apollo_net.blobs[nmn_hiddens[0].encode()].shape[0]
+        self.prediction_data = self.apollo_net.blobs[self.prediction.encode()].data
         self.att_data = np.zeros((batch_size, 14, 14))
 
     def forward_choice(self, module_layouts, layout_mask, nmn_hiddens):
@@ -504,13 +504,13 @@ class NmnModel:
         tile_mask = "CHOOSE_tile_mask"
         sum = "CHOOSE%d_sum" % len(module_layouts)
 
-        batch_size = self.apollo_net.blobs[nmn_hiddens[0]].shape[0]
+        batch_size = self.apollo_net.blobs[nmn_hiddens[0].encode()].shape[0]
 
         output_hidden = self.config.pred_hidden \
                 if hasattr(self.config, "pred_hidden") \
                 else len(ANSWER_INDEX)
         for h in nmn_hiddens:
-            self.apollo_net.blobs[h].reshape((batch_size, output_hidden, 1))
+            self.apollo_net.blobs[h.encode()].reshape((batch_size, output_hidden, 1))
         if len(nmn_hiddens) == 1:
             concat_layer = nmn_hiddens[0]
         else:
@@ -518,7 +518,7 @@ class NmnModel:
             concat_layer = concat
 
         self.apollo_net.f(NumpyData(mask, layout_mask))
-        self.apollo_net.blobs[mask].reshape(
+        self.apollo_net.blobs[mask.encode()].reshape(
                 (batch_size, 1, len(module_layouts)))
         self.apollo_net.f(Tile(
                 tile_mask, axis=1, tiles=output_hidden, bottoms=[mask]))
@@ -529,7 +529,7 @@ class NmnModel:
                 weight_filler=Filler("constant", 1),
                 bias_filler=Filler("constant", 0),
                 param_lr_mults=[0, 0]))
-        self.apollo_net.blobs[sum].reshape((batch_size, output_hidden))
+        self.apollo_net.blobs[sum.encode()].reshape((batch_size, output_hidden))
 
         return sum
 
@@ -551,7 +551,7 @@ class NmnModel:
         net.f(InnerProduct(
                 proj_question, self.config.layout_hidden,
                 bottoms=[question_hidden]))
-        net.blobs[proj_question].reshape(
+        net.blobs[proj_question.encode()].reshape(
                 (batch_size, 1, self.config.layout_hidden))
         net.f(Tile(tile_question, axis=1, tiles=n_layouts,
                 bottoms=[proj_question]))
@@ -562,7 +562,7 @@ class NmnModel:
             net.f(NumpyData(layout_feats % i, layout_data[:,i,:]))
             net.f(InnerProduct(proj_layout % i, self.config.layout_hidden,
                     bottoms=[layout_feats % i]))
-            net.blobs[proj_layout % i].reshape(
+            net.blobs[(proj_layout % i).encode()].reshape(
                     (batch_size, 1, self.config.layout_hidden))
             concat_bottoms.append(proj_layout % i)
 
@@ -575,10 +575,10 @@ class NmnModel:
         net.f(Eltwise(sum, "SUM", bottoms=[tile_question, concat_layer]))
         net.f(ReLU(relu, bottoms=[sum]))
         net.f(InnerProduct(pred, 1, axis=2, bottoms=[relu]))
-        net.blobs[pred].reshape((batch_size, n_layouts))
+        net.blobs[pred.encode()].reshape((batch_size, n_layouts))
         net.f(Softmax(softmax, bottoms=[pred]))
 
-        probs = net.blobs[softmax].data
+        probs = net.blobs[softmax.encode()].data
 
         layout_choices = []
         for i in range(len(layouts)):
@@ -606,7 +606,7 @@ class NmnModel:
 
         if features not in net.blobs:
             net.f(DummyData(features, feature_data.shape))
-        net.blobs[features].data[...] = feature_data
+        net.blobs[features.encode()].data[...] = feature_data
 
         if dropout:
             net.f(Dropout(features_dropout, 0.5, bottoms=[features]))
@@ -702,7 +702,7 @@ class NmnModel:
             acc_loss = net.f(EuclideanLoss(
                 loss, bottoms=[self.prediction, target]))
 
-            pred_probs = net.blobs[self.prediction].data
+            pred_probs = net.blobs[self.prediction.encode()].data
             batch_size = pred_probs.shape[0]
             pred_ans_probs = np.sum(np.abs(answer_data - pred_probs) ** 2, axis=1)
             # TODO
@@ -715,7 +715,7 @@ class NmnModel:
 
             net.f(Softmax(datum_loss, bottoms=[self.prediction]))
 
-            pred_probs = net.blobs[datum_loss].data
+            pred_probs = net.blobs[datum_loss.encode()].data
             batch_size = pred_probs.shape[0]
             pred_ans_probs = pred_probs[np.arange(batch_size), answer_data.astype(np.int)]
             pred_ans_log_probs = np.log(pred_ans_probs)
