@@ -5,3 +5,5 @@
 logs
 vis
 data
+.ipynb_checkpoints/*
+*.caffemodel

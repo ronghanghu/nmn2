@@ -25,10 +25,13 @@ def main():
     task = tasks.load_task(config)
     model = models.build_model(config.model, config.opt)
 
+    model.apollo_net.save('./snapshot/vqa_epoch_init.caffemodel')
     for i_epoch in range(config.opt.iters):
+        print('epoch %d / %d' % (i_epoch, config.opt.iters))
 
         train_loss, train_acc, _ = \
                 do_iter(task.train, model, config, train=True)
+        model.apollo_net.save('./snapshot/vqa_epoch_%d.caffemodel' % i_epoch)
         val_loss, val_acc, val_predictions = \
                 do_iter(task.val, model, config, vis=True)
         # test_loss, test_acc, test_predictions = \
@@ -101,6 +104,7 @@ def do_iter(task_set, model, config, train=False, vis=False):
 
         batch_loss, batch_acc, batch_preds = do_batch(
                 batch_data, model, config, train, vis)
+        print('batch %d, loss = %f' % (n_batches, batch_loss))
 
         loss += batch_loss
         acc += batch_acc
