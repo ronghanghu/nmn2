@@ -172,8 +172,8 @@ class VqaTask:
         logging.debug("computed image feature normalizers")
         logging.debug("using %s chooser", config.task.chooser)
 
-        self.train = VqaTaskSet(config.task, ["train2014", "val2014"], modules, mean, std)
-        self.val = VqaTaskSet(config.task, ["test-dev2015"], modules, mean, std)
+        self.train = VqaTaskSet(config.task, ["train2014"], modules, mean, std)
+        self.val = VqaTaskSet(config.task, ["val2014"], modules, mean, std)
         # self.test = VqaTaskSet(config.task, ["test2015"], modules, mean, std)
 
 class VqaTaskSet:
